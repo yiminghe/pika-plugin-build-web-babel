@@ -1,0 +1,17 @@
+{
+  "name": "pika-plugin-build-web-babel",
+  "description": "A @pika/pack plugin:  Adds an babel compiled ESM distribution to your package",
+  "version": "0.6.3",
+  "files": [
+    "src/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yiminghe/pika-plugin-build-web-babel"
+  },
+  "dependencies": {
+    "rollup": "^1.1.0",
+    "rollup-plugin-babel": "^4.3.0"
+  },
+  "main": "src/index.js"
+}
