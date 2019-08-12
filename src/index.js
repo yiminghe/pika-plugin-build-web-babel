@@ -64,4 +64,3 @@ async function build({
 exports.beforeJob = beforeJob;
 exports.build = build;
 exports.manifest = manifest;
-//# sourceMappingURL=index.js.map
