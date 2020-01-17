@@ -10,6 +10,7 @@ try {
 }
 var rollup = require('rollup');
 var rollupBabel = (require('rollup-plugin-babel'));
+var resolve = require('@rollup/plugin-node-resolve');
 
 async function beforeJob({
                            out
@@ -31,18 +32,27 @@ function manifest(manifest) {
   manifest.module = manifest.module || 'dist-web/index.js';
 }
 
+const extensions = [ '.js', '.ts', '.tsx' ];
+
 async function build({
                        out,
                        cwd,
                        options,
                        reporter
                      }) {
+  const pkg = require(path.join(cwd, 'package.json'));
   const writeToWeb = path.join(out, 'dist-web', 'index.js');
   const result = await rollup.rollup({
     input: options.input && path.join(cwd, options.input) || path.join(cwd, `src/index.js`),
-    plugins: [rollupBabel({
-      exclude: 'node_modules/**'
-    })],
+    external: Object.keys(pkg.dependencies || {}),
+    plugins: [
+      resolve({
+        extensions,
+      }),
+      rollupBabel({
+        exclude: 'node_modules/**',
+        extensions
+      }) ],
     onwarn: (warning, defaultOnWarnHandler) => {
       // // Unresolved external imports are expected
       if (warning.code === 'UNRESOLVED_IMPORT' && !(warning.source.startsWith('./') || warning.source.startsWith('../'))) {
