@@ -44,13 +44,7 @@ async function build({
   const writeToWeb = path.join(out, 'dist-web', 'index.js');
   const extensions = options.extensions || defaultExtensions;
   const src = path.join(cwd, 'src');
-  const files = fs.readdirSync(src);
-  let input;
-  files.forEach(f => {
-    if (f.startsWith('index.')) {
-      input = path.join(src, f);
-    }
-  });
+  let input = path.join(src, 'index');
   const result = await rollup.rollup({
     input,
     external: Object.keys(pkg.dependencies || {}),
