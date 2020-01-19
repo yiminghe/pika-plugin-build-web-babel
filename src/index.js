@@ -32,7 +32,7 @@ function manifest(manifest) {
   manifest.module = manifest.module || 'dist-web/index.js';
 }
 
-const extensions = [ '.js', '.ts', '.tsx' ];
+const defaultExtensions = [ '.jsx','.js', '.ts', '.tsx' ];
 
 async function build({
                        out,
@@ -42,8 +42,9 @@ async function build({
                      }) {
   const pkg = require(path.join(cwd, 'package.json'));
   const writeToWeb = path.join(out, 'dist-web', 'index.js');
+  const extensions =  options.extensions || defaultExtensions;
   const result = await rollup.rollup({
-    input: options.input && path.join(cwd, options.input) || path.join(cwd, `src/index.js`),
+    input: path.join(cwd, `src/index`),
     external: Object.keys(pkg.dependencies || {}),
     plugins: [
       resolve({

@@ -8,9 +8,9 @@ https://github.com/pikapkg/builders/pull/77
 
 ## params
 
-### input: string
+### extensions: string[]
 
-src input. defaults to `src/index.js`, can set to `src/index.ts` if using typescript
+defaults to ['.js','.jsx','.ts','.tsx']
 
 ### sourcemap: boolean
 
