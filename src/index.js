@@ -43,6 +43,7 @@ async function build({
   const pkg = require(path.join(cwd, 'package.json'));
   const writeToWeb = path.join(out, 'dist-web', 'index.js');
   const extensions = options.extensions || defaultExtensions;
+  const runtimeHelpers = options.runtimeHelpers || undefined;
   const src = path.join(cwd, 'src');
   let input = path.join(src, 'index');
   const result = await rollup.rollup({
@@ -54,7 +55,8 @@ async function build({
       }),
       rollupBabel({
         exclude: 'node_modules/**',
-        extensions
+        extensions,
+        runtimeHelpers
       }) ],
     onwarn: (warning, defaultOnWarnHandler) => {
       // // Unresolved external imports are expected
