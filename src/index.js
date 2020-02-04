@@ -40,15 +40,17 @@ async function build({
                        options,
                        reporter
                      }) {
-  const pkg = require(path.join(cwd, 'package.json'));
   const writeToWeb = path.join(out, 'dist-web', 'index.js');
   const extensions = options.extensions || defaultExtensions;
   const runtimeHelpers = options.runtimeHelpers || undefined;
   const src = path.join(cwd, 'src');
   let input = path.join(src, 'index');
+
   const result = await rollup.rollup({
     input,
-    external: Object.keys(pkg.dependencies || {}),
+    external: function(s) {
+     return !(s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
+    },
     plugins: [
       resolve({
         extensions,
