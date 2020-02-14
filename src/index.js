@@ -11,26 +11,25 @@ var rollup = require('rollup');
 var rollupBabel = (require('rollup-plugin-babel'));
 var resolve = require('@rollup/plugin-node-resolve');
 
-const defaultDist = 'dist-web/index.js';
 const defaultFormat = 'esm';
 
 function manifest(manifest, { options }) {
-  const dist = options.dist || defaultDist;
   const format = options.format || defaultFormat;
+  const dist = `${format}/index.js`;
   const field = format === 'esm' ? 'module' : 'main';
   manifest[field] = manifest[field] || dist;
 }
 
-const defaultExtensions = [ '.jsx', '.js', '.ts', '.tsx' ];
+const defaultExtensions = ['.jsx', '.js', '.ts', '.tsx'];
 
 async function build({
-                       out,
-                       cwd,
-                       options,
-                       reporter
-                     }) {
-                      const dist = options.dist || defaultDist;
-                      const format = options.format || defaultFormat;
+  out,
+  cwd,
+  options,
+  reporter
+}) {
+  const format = options.format || defaultFormat;
+  const dist = `${format}/index.js`;
   const writeToWeb = path.join(out, dist);
   const extensions = options.extensions || defaultExtensions;
   const runtimeHelpers = options.runtimeHelpers || undefined;
@@ -39,8 +38,8 @@ async function build({
 
   const result = await rollup.rollup({
     input,
-    external: function(s) {
-     return !(s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
+    external: function (s) {
+      return !(s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
     },
     plugins: [
       resolve({
@@ -50,8 +49,8 @@ async function build({
         exclude: 'node_modules/**',
         extensions,
         runtimeHelpers,
-        ...(options.envName?{envName:options.envName}:{}),
-      }) ],
+        ...(options.envName ? { envName: options.envName } : {}),
+      })],
     onwarn: (warning, defaultOnWarnHandler) => {
       // // Unresolved external imports are expected
       if (warning.code === 'UNRESOLVED_IMPORT' && !(warning.source.startsWith('./') || warning.source.startsWith('../'))) {
