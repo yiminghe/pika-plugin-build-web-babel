@@ -1,5 +1,4 @@
 var path = (require('path'));
-var fs = (require('fs'));
 var types;
 try {
   types = require('@pika/types');
@@ -12,24 +11,14 @@ var rollup = require('rollup');
 var rollupBabel = (require('rollup-plugin-babel'));
 var resolve = require('@rollup/plugin-node-resolve');
 
-async function beforeJob({
-                           out
-                         }) {
-  const srcDirectory = path.join(out, 'dist-src/');
+const defaultDist = 'dist-web/index.js';
+const defaultFormat = 'esm';
 
-  if (!fs.existsSync(srcDirectory)) {
-    throw new types.MessageError('"dist-src/" does not exist, or was not yet created in the pipeline.');
-  }
-
-  const srcEntrypoint = path.join(out, 'dist-src/index.js');
-
-  if (!fs.existsSync(srcEntrypoint)) {
-    throw new types.MessageError('"dist-src/index.js" is the expected standard entrypoint, but it does not exist.');
-  }
-}
-
-function manifest(manifest) {
-  manifest.module = manifest.module || 'dist-web/index.js';
+function manifest(manifest, { options }) {
+  const dist = options.dist || defaultDist;
+  const format = options.format || defaultFormat;
+  const field = format === 'esm' ? 'module' : 'main';
+  manifest[field] = manifest[field] || dist;
 }
 
 const defaultExtensions = [ '.jsx', '.js', '.ts', '.tsx' ];
@@ -40,7 +29,9 @@ async function build({
                        options,
                        reporter
                      }) {
-  const writeToWeb = path.join(out, 'dist-web', 'index.js');
+                      const dist = options.dist || defaultDist;
+                      const format = options.format || defaultFormat;
+  const writeToWeb = path.join(out, dist);
   const extensions = options.extensions || defaultExtensions;
   const runtimeHelpers = options.runtimeHelpers || undefined;
   const src = path.join(cwd, 'src');
@@ -58,7 +49,8 @@ async function build({
       rollupBabel({
         exclude: 'node_modules/**',
         extensions,
-        runtimeHelpers
+        runtimeHelpers,
+        ...(options.envName?{envName:options.envName}:{}),
       }) ],
     onwarn: (warning, defaultOnWarnHandler) => {
       // // Unresolved external imports are expected
@@ -71,13 +63,13 @@ async function build({
   });
   await result.write({
     file: writeToWeb,
-    format: 'esm',
+    format,
     exports: 'named',
     sourcemap: options.sourcemap === undefined ? true : options.sourcemap
   });
   reporter.created(writeToWeb, 'module');
 }
 
-exports.beforeJob = beforeJob;
+
 exports.build = build;
 exports.manifest = manifest;

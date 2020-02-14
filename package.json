@@ -1,7 +1,7 @@
 {
   "name": "pika-plugin-build-web-babel",
   "description": "A @pika/pack plugin:  Adds an babel compiled ESM distribution to your package",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "files": [
     "src/"
   ],
@@ -17,5 +17,8 @@
   "scripts": {
     "pub": "npm publish && git push"
   },
-  "main": "src/index.js"
+  "main": "src/index.js",
+  "devDependencies": {
+    "@babel/core": "^7.8.4"
+  }
 }
