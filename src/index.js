@@ -12,10 +12,13 @@ var rollupBabel = (require('rollup-plugin-babel'));
 var resolve = require('@rollup/plugin-node-resolve');
 
 const defaultFormat = 'esm';
-
+const dirMap = {
+  cjs: 'dist-node',
+  esm: 'dist-web',
+}
 function manifest(manifest, { options }) {
   const format = options.format || defaultFormat;
-  const dist = `${format}/index.js`;
+  const dist = `${dirMap[format]}/index.js`;
   const field = format === 'esm' ? 'module' : 'main';
   manifest[field] = manifest[field] || dist;
 }
@@ -29,7 +32,7 @@ async function build({
   reporter
 }) {
   const format = options.format || defaultFormat;
-  const dist = `${format}/index.js`;
+  const dist = `${dirMap[format]}/index.js`;
   const writeToWeb = path.join(out, dist);
   const extensions = options.extensions || defaultExtensions;
   const runtimeHelpers = options.runtimeHelpers || undefined;
