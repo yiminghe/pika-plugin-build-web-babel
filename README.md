@@ -19,3 +19,9 @@ defaults to ['.js','.jsx','.ts','.tsx']
 ### sourcemap: boolean
 
 whether generate sourcemap file. defaults to true
+
+## history
+
+### 0.8.0 / 2020.02.29
+
+- support tsconfig paths
