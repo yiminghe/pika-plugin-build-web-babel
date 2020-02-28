@@ -54,13 +54,14 @@ async function build({
     })
   ];
 
-  const loadResult = TsconfigPaths.loadConfig(cwd);
-  const matchPath = TsconfigPaths.createMatchPath(
-    loadResult.absoluteBaseUrl,
-    loadResult.paths,
-    ['main', 'module']
-  );
+  let matchPath;
   if (isTs) {
+    const loadResult = TsconfigPaths.loadConfig(cwd);
+    matchPath = TsconfigPaths.createMatchPath(
+      loadResult.absoluteBaseUrl,
+      loadResult.paths,
+      ['main', 'module']
+    );
     plugins.push({
       name: 'rollup-plugin-ts-paths',
       resolveId(s) {
@@ -82,10 +83,12 @@ async function build({
       if (isLocal) {
         return false;
       }
-      let ret;
-      ret = matchPath(s, TsconfigPaths.ReadJsonSync, TsconfigPaths.FileExistsSync, extensions);
-      if (ret) {
-        return false;
+      if (isTs) {
+        let ret;
+        ret = matchPath(s, TsconfigPaths.ReadJsonSync, TsconfigPaths.FileExistsSync, extensions);
+        if (ret) {
+          return false;
+        }
       }
       return true;
     },
