@@ -57,24 +57,26 @@ async function build({
   let matchPath;
   if (isTs) {
     const loadResult = TsconfigPaths.loadConfig(cwd);
-    matchPath = TsconfigPaths.createMatchPath(
-      loadResult.absoluteBaseUrl,
-      loadResult.paths,
-      ['main', 'module']
-    );
-    plugins.push({
-      name: 'rollup-plugin-ts-paths',
-      resolveId(s) {
-        let ret = matchPath(s, TsconfigPaths.ReadJsonSync, TsconfigPaths.FileExistsSync, extensions);
-        for (e of extensions) {
-          if (fs.existsSync(`${ret}${e}`)) {
-            ret = `${ret}${e}`;
-            break;
+    if (loadResult && loadResult.resultType !== 'failed') {
+      matchPath = TsconfigPaths.createMatchPath(
+        loadResult.absoluteBaseUrl,
+        loadResult.paths,
+        ['main', 'module']
+      );
+      plugins.push({
+        name: 'rollup-plugin-ts-paths',
+        resolveId(s) {
+          let ret = matchPath(s, TsconfigPaths.ReadJsonSync, TsconfigPaths.FileExistsSync, extensions);
+          for (e of extensions) {
+            if (fs.existsSync(`${ret}${e}`)) {
+              ret = `${ret}${e}`;
+              break;
+            }
           }
+          return ret;
         }
-        return ret;
-      }
-    });
+      });
+    }
   }
   const result = await rollup.rollup({
     input,
@@ -83,7 +85,7 @@ async function build({
       if (isLocal) {
         return false;
       }
-      if (isTs) {
+      if (matchPath) {
         let ret;
         ret = matchPath(s, TsconfigPaths.ReadJsonSync, TsconfigPaths.FileExistsSync, extensions);
         if (ret) {
