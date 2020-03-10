@@ -18,10 +18,14 @@ const dirMap = {
   cjs: 'dist-node',
   esm: 'dist-web',
 }
-function manifest(manifest, { options }) {
+function manifest(manifest, { options, cwd }) {
+  const srcDir = path.join(cwd, 'src');
   const format = options.format || defaultFormat;
   const dist = `${dirMap[format]}/index.js`;
   const field = format === 'esm' ? 'module' : 'main';
+  if (fs.existsSync(path.join(srcDir, 'index.d.ts'))) {
+    manifest.types = 'index.d.ts';
+  }
   manifest[field] = manifest[field] || dist;
 }
 
@@ -40,6 +44,11 @@ async function build({
   const runtimeHelpers = options.runtimeHelpers || undefined;
   const src = path.join(cwd, 'src');
   let input = path.join(src, 'index');
+
+  if (fs.existsSync(path.join(src, 'index.d.ts'))) {
+    fs.createReadStream(path.join(src, 'index.d.ts')).pipe(fs.createWriteStream(path.join(out, 'index.d.ts')));
+  }
+
   const isTs = (fs.existsSync(input + '.ts') || fs.existsSync(input + '.tsx'));
   const plugins = [
     resolve({
