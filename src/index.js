@@ -37,6 +37,7 @@ async function build({
   const dist = `${dirMap[format]}/index.js`;
   const writeToWeb = path.join(out, dist);
   const extensions = options.extensions || defaultExtensions;
+  const babel = options.babel || {};
   const runtimeHelpers = options.runtimeHelpers || undefined;
   const src = path.join(cwd, 'src');
   let input = path.join(src, 'index');
@@ -52,6 +53,7 @@ async function build({
       extensions,
       runtimeHelpers,
       ...(options.envName ? { envName: options.envName } : {}),
+      ...babel,
     })
   ];
 
