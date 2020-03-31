@@ -13,6 +13,7 @@ var commonjs = (require('@rollup/plugin-commonjs'));
 var resolve = require('@rollup/plugin-node-resolve');
 var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
+var { terser } = require("rollup-plugin-terser");
 
 const defaultFormat = 'esm';
 const dirMap = {
@@ -66,6 +67,10 @@ async function build({
 
   if (format === 'umd') {
     plugins.push(commonjs());
+  }
+
+  if(options.terser){
+    plugins.push(terser());
   }
 
   let matchPath;
