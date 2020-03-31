@@ -9,19 +9,26 @@ try {
 }
 var rollup = require('rollup');
 var rollupBabel = (require('rollup-plugin-babel'));
+var commonjs = (require('@rollup/plugin-commonjs'));
 var resolve = require('@rollup/plugin-node-resolve');
 var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
 
 const defaultFormat = 'esm';
 const dirMap = {
+  umd: 'dist-umd',
   cjs: 'dist-node',
   esm: 'dist-web',
 }
+const fieldMap = {
+  esm: 'module',
+  cjs: 'main',
+  umd: 'umd:main',
+};
 function manifest(manifest, { options }) {
   const format = options.format || defaultFormat;
   const dist = `${dirMap[format]}/index.js`;
-  const field = format === 'esm' ? 'module' : 'main';
+  const field = fieldMap[format];
   manifest[field] = manifest[field] || dist;
 }
 
@@ -57,6 +64,10 @@ async function build({
     })
   ];
 
+  if (format === 'umd') {
+    plugins.push(commonjs());
+  }
+
   let matchPath;
   if (isTs) {
     const loadResult = TsconfigPaths.loadConfig(cwd);
@@ -81,9 +92,17 @@ async function build({
       });
     }
   }
+
+  let external;
+
+  if (format === 'umd') {
+    external = options.external || ['react', 'react-dom'];
+  }
+
   const result = await rollup.rollup({
     input,
-    external: function (s) {
+
+    external: external || function (s) {
       const isLocal = (s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
       if (isLocal) {
         return false;
@@ -97,7 +116,7 @@ async function build({
       }
       return true;
     },
-    plugins: plugins,
+    plugins,
     onwarn: (warning, defaultOnWarnHandler) => {
       // // Unresolved external imports are expected
       if (warning.code === 'UNRESOLVED_IMPORT' && !(warning.source.startsWith('./') || warning.source.startsWith('../'))) {
@@ -107,9 +126,20 @@ async function build({
       defaultOnWarnHandler(warning);
     }
   });
+  let output = {};
+  if (format === 'umd') {
+    output = {
+      name: options.name,
+      globals: options.globals || {
+        react: 'React',
+        'react-dom': 'ReactDOM',
+      },
+    };
+  }
   await result.write({
     file: writeToWeb,
     format,
+    output,
     exports: 'named',
     sourcemap: options.sourcemap === undefined ? true : options.sourcemap
   });
