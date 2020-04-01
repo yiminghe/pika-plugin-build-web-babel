@@ -14,6 +14,7 @@ var resolve = require('@rollup/plugin-node-resolve');
 var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
 var { terser } = require("rollup-plugin-terser");
+var workerPlugin = require('./worker-plugin');
 
 const defaultFormat = 'esm';
 const dirMap = {
@@ -52,6 +53,11 @@ async function build({
 
   const isTs = (fs.existsSync(input + '.ts') || fs.existsSync(input + '.tsx'));
   const plugins = [
+    workerPlugin({
+      pattern: /^.+\.worker$/,
+      extensions,
+    }),
+
     resolve({
       extensions,
     }),
@@ -69,7 +75,7 @@ async function build({
     plugins.push(commonjs());
   }
 
-  if(options.terser){
+  if (options.terser) {
     plugins.push(terser());
   }
 
@@ -110,6 +116,9 @@ async function build({
     external: external || function (s) {
       const isLocal = (s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
       if (isLocal) {
+        return false;
+      }
+      if (s === 'rollup-plugin-web-worker-loader::helper') {
         return false;
       }
       if (matchPath) {

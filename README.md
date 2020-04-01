@@ -22,6 +22,10 @@ whether generate sourcemap file. defaults to true
 
 ## history
 
+### 0.9.0 / 2020.04.01
+
+- support worker
+
 ### 0.8.0 / 2020.02.29
 
 - support tsconfig paths
