@@ -15,7 +15,7 @@ var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
 var { terser } = require("rollup-plugin-terser");
 var workerPlugin = require('./worker-plugin');
-var postcss = require('rollup-plugin-postcss'); 
+var postcss = require('rollup-plugin-postcss');
 
 const defaultFormat = 'esm';
 const dirMap = {
@@ -65,6 +65,7 @@ async function build({
     }),
 
     resolve({
+      browser: true,
       extensions,
     }),
 
@@ -77,9 +78,7 @@ async function build({
     })
   ];
 
-  if (format === 'umd') {
-    plugins.push(commonjs());
-  }
+  plugins.push(commonjs());
 
   if (options.terser) {
     plugins.push(terser());
