@@ -192,7 +192,11 @@ module.exports = function workerLoaderPlugin(config = null) {
           const { inputOptions, workerID, target } = idMap.get(id);
           exclude.add(id);
           exclude.add(target);
-          rollup.rollup(inputOptions).then(bundle => {
+          let newInput = {
+            ...inputOptions,
+            external: () => false
+          };
+          rollup.rollup(newInput).then(bundle => {
             exclude.delete(id);
             exclude.delete(target);
             bundle.generate({ format: 'es', name: id, sourcemap: true }).then(result => {
