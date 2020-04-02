@@ -82,7 +82,7 @@ async function build({
 
   plugins.push(commonjs());
 
-  if (options.terser) {
+  if (options.minimize) {
     plugins.push(terser());
   }
 
