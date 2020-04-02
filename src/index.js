@@ -16,6 +16,7 @@ var TsconfigPaths = require('tsconfig-paths');
 var { terser } = require("rollup-plugin-terser");
 var workerPlugin = require('./worker-plugin');
 var postcss = require('rollup-plugin-postcss');
+var json = require('@rollup/plugin-json');
 
 const defaultFormat = 'esm';
 const dirMap = {
@@ -54,6 +55,7 @@ async function build({
 
   const isTs = (fs.existsSync(input + '.ts') || fs.existsSync(input + '.tsx'));
   const plugins = [
+    json(),
     postcss({
       extract: options.extractCSS,
       plugins: []
