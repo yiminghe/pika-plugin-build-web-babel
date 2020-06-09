@@ -49,6 +49,7 @@ async function build({
   const writeToWeb = path.join(out, dist);
   const extensions = options.extensions || defaultExtensions;
   const babel = options.babel || {};
+  const preserveModules = options.preserveModules || false;
   const runtimeHelpers = options.runtimeHelpers || undefined;
   const src = path.join(cwd, 'src');
   let input = path.join(src, 'index');
@@ -120,6 +121,8 @@ async function build({
   const result = await rollup.rollup({
     input,
 
+    preserveModules,
+
     external: external || function (s) {
       const isLocal = (s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
       if (isLocal) {
@@ -147,9 +150,12 @@ async function build({
       defaultOnWarnHandler(warning);
     }
   });
-  let output = {};
+  let output = {
+    dir: path.dirname(writeToWeb),
+  };
   if (format === 'umd') {
     output = {
+      ...output,
       name: options.name,
       globals: options.globals || {
         react: 'React',
@@ -157,13 +163,20 @@ async function build({
       },
     };
   }
-  await result.write({
+  const config = {
     file: writeToWeb,
     format,
     output,
     exports: 'named',
     sourcemap: options.sourcemap === undefined ? true : options.sourcemap
-  });
+  };
+  if(preserveModules){
+    delete config.file;
+  } else {
+    delete config.output.dir;
+  }
+
+  await result.write(config);
   reporter.created(writeToWeb, 'module');
 }
 
