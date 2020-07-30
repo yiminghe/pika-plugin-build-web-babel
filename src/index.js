@@ -10,7 +10,7 @@ try {
 var rollup = require('rollup');
 var rollupBabel = (require('rollup-plugin-babel'));
 var commonjs = (require('@rollup/plugin-commonjs'));
-var resolve = require('@rollup/plugin-node-resolve');
+var {nodeResolve} = require('@rollup/plugin-node-resolve');
 var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
 var { terser } = require("rollup-plugin-terser");
@@ -67,7 +67,7 @@ async function build({
       extensions,
     }),
 
-    resolve({
+    nodeResolve({
       browser: true,
       extensions,
     }),
@@ -117,7 +117,6 @@ async function build({
   if (format === 'umd') {
     external = options.external || ['react', 'react-dom'];
   }
-
   const result = await rollup.rollup({
     input,
 
@@ -166,14 +165,14 @@ async function build({
   const config = {
     file: writeToWeb,
     format,
-    output,
+    ...output,
     exports: 'named',
     sourcemap: options.sourcemap === undefined ? true : options.sourcemap
   };
   if(preserveModules){
     delete config.file;
   } else {
-    delete config.output.dir;
+    delete config.dir;
   }
 
   await result.write(config);
