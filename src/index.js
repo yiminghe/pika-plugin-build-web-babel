@@ -124,7 +124,7 @@ async function build({
 
     preserveModules,
 
-    external: external || function (s) {
+    external: external || function (s, p, r) {
       const isLocal = (s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
       if (isLocal) {
         return false;
@@ -139,6 +139,11 @@ async function build({
           return false;
         }
       }
+      
+      if (r && !/node_modules/.test(s)){
+        return false;
+      }
+      
       return true;
     },
     plugins,
