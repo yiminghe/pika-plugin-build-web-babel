@@ -140,8 +140,11 @@ async function build({
         }
       }
       
-      if (r && !/node_modules/.test(s)){
-        return false;
+      if (r){
+        const pathNames = s.split(path.sep);
+        if (!pathNames.includes('node_modules')){
+          return false;
+        }
       }
       
       return true;
