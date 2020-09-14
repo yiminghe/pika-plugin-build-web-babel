@@ -124,7 +124,7 @@ async function build({
 
     preserveModules,
 
-    external: external || function (s) {
+    external: external || function (s, p, r) {
       const isLocal = (s.startsWith('/') || s.startsWith('./') || s.startsWith('../'));
       if (isLocal) {
         return false;
@@ -139,6 +139,14 @@ async function build({
           return false;
         }
       }
+      
+      if (r){
+        const pathNames = s.split(path.sep);
+        if (!pathNames.includes('node_modules')){
+          return false;
+        }
+      }
+      
       return true;
     },
     plugins,
