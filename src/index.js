@@ -31,7 +31,7 @@ const fieldMap = {
 };
 function manifest(manifest, { options }) {
   const format = options.format || defaultFormat;
-  const dist = `${dirMap[format]}/index.js`;
+  const dist = `${dirMap[format]}/index.${options.mjs ? 'mjs' : 'js'}`;
   const field = fieldMap[format];
   manifest[field] = manifest[field] || dist;
 }
@@ -45,7 +45,7 @@ async function build({
   reporter
 }) {
   const format = options.format || defaultFormat;
-  const dist = `${dirMap[format]}/index.js`;
+  const dist = `${dirMap[format]}/index.${options.mjs ? 'mjs' : 'js'}`;
   const writeToWeb = path.join(out, dist);
   const extensions = options.extensions || defaultExtensions;
   const babel = options.babel || {};
@@ -139,14 +139,14 @@ async function build({
           return false;
         }
       }
-      
-      if (r){
+
+      if (r) {
         const pathNames = s.split(path.sep);
-        if (!pathNames.includes('node_modules')){
+        if (!pathNames.includes('node_modules')) {
           return false;
         }
       }
-      
+
       return true;
     },
     plugins,
