@@ -15,7 +15,13 @@ var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
 var { terser } = require("rollup-plugin-terser");
 var workerPlugin = require('./worker-plugin');
-var postcss = require('rollup-plugin-postcss');
+
+var postcss;
+
+try {
+  postcss = require('rollup-plugin-postcss');
+} catch (e) { }
+
 var json = require('@rollup/plugin-json');
 var replace = require('@rollup/plugin-replace')
 const defaultFormat = 'esm';
@@ -57,7 +63,8 @@ async function build({
   const isTs = (fs.existsSync(input + '.ts') || fs.existsSync(input + '.tsx'));
   const plugins = [
     json(),
-    postcss({
+
+    postcss && postcss({
       extract: options.extractCSS,
       plugins: []
     }),
@@ -79,7 +86,8 @@ async function build({
       ...(options.envName ? { envName: options.envName } : {}),
       ...babel,
     })
-  ];
+  ].filter(Boolean);
+  
   plugins.push(commonjs());
 
   if (options.minimize) {
