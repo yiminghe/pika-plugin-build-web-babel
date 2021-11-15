@@ -8,7 +8,7 @@ try {
   };
 }
 var rollup = require('rollup');
-var rollupBabel = (require('rollup-plugin-babel'));
+var rollupBabel = (require('@rollup/plugin-babel'));
 var commonjs = (require('@rollup/plugin-commonjs'));
 var { nodeResolve } = require('@rollup/plugin-node-resolve');
 var fs = require('fs');
@@ -56,7 +56,7 @@ async function build({
   const extensions = options.extensions || defaultExtensions;
   const babel = options.babel || {};
   const preserveModules = options.preserveModules || false;
-  const runtimeHelpers = options.runtimeHelpers || undefined;
+  const babelHelpers = options.babelHelpers || undefined;
   const src = path.join(cwd, 'src');
   let input = path.join(src, 'index');
 
@@ -82,7 +82,7 @@ async function build({
     rollupBabel({
       exclude: 'node_modules/**',
       extensions,
-      runtimeHelpers,
+      babelHelpers,
       ...(options.envName ? { envName: options.envName } : {}),
       ...babel,
     })
