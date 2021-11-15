@@ -1,15 +1,7 @@
 var path = (require('path'));
-var types;
-try {
-  types = require('@pika/types');
-} catch (e) {
-  types = {
-    MessageError: Error,
-  };
-}
 var rollup = require('rollup');
-var rollupBabel = (require('@rollup/plugin-babel'));
-var commonjs = (require('@rollup/plugin-commonjs'));
+var rollupBabel = require('@rollup/plugin-babel').babel;
+var commonjs = require('@rollup/plugin-commonjs');
 var { nodeResolve } = require('@rollup/plugin-node-resolve');
 var fs = require('fs');
 var TsconfigPaths = require('tsconfig-paths');
