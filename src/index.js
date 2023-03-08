@@ -18,6 +18,7 @@ var json = require('@rollup/plugin-json');
 var replace = require('@rollup/plugin-replace')
 const defaultFormat = 'esm';
 const dirMap = {
+  iife: 'dist-iife',
   umd: 'dist-umd',
   cjs: 'dist-node',
   esm: 'dist-web',
@@ -26,6 +27,7 @@ const fieldMap = {
   esm: 'module',
   cjs: 'main',
   umd: 'umd:main',
+  iife: 'iife:main',
 };
 function manifest(manifest, { options }) {
   const format = options.format || defaultFormat;
@@ -79,7 +81,7 @@ async function build({
       ...babel,
     })
   ].filter(Boolean);
-  
+
   plugins.push(commonjs());
 
   if (options.minimize) {
@@ -113,7 +115,7 @@ async function build({
 
   let external;
 
-  if (format === 'umd') {
+  if (format === 'umd' || format === 'iife') {
     external = options.external || ['react', 'react-dom'];
     plugins.push(replace({
       "process.env.NODE_ENV": "'production'"
@@ -162,7 +164,7 @@ async function build({
   let output = {
     dir: path.dirname(writeToWeb),
   };
-  if (format === 'umd') {
+  if (format === 'umd' || format === 'iife') {
     output = {
       ...output,
       name: options.name,
